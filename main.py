@@ -1,8 +1,12 @@
 import os
+from google.oauth2 import service_account
 from google.cloud import storage, texttospeech
 from flask import Flask, request, jsonify
 
 app = Flask(__name__)
+credentials = service_account.Credentials.from_service_account_file(r"C:\Users\MY PC\Documents\TTS\tts-service-pro1-cf81f6a8c62f.json")
+# Specify your project ID
+project_id = "tts-service-pro1"
 @app.route("/generate-audio", methods=["POST"])
 def generate_audio():
     try:
@@ -18,41 +22,29 @@ def generate_audio():
         voice_name = "en-US-Wavenet-D"
 
         # Initialize TTS client
-        try:
-            tts_client = texttospeech.TextToSpeechClient()
-        except Exception as e:
-            return jsonify({"error": f"Failed to initialize Text-to-Speech client: {str(e)}"}), 500
+        tts_client = texttospeech.TextToSpeechClient(credentials=credentials)
 
         # Configure TTS request
-        try:
-            synthesis_input = texttospeech.SynthesisInput(text=text)
-            voice_params = texttospeech.VoiceSelectionParams(
-                language_code=language_code, name=voice_name
-            )
-            audio_config = texttospeech.AudioConfig(audio_encoding=texttospeech.AudioEncoding.MP3)
+        synthesis_input = texttospeech.SynthesisInput(text=text)
+        voice_params = texttospeech.VoiceSelectionParams(
+            language_code=language_code, name=voice_name
+        )
+        audio_config = texttospeech.AudioConfig(audio_encoding=texttospeech.AudioEncoding.MP3)
 
-            # Generate audio
-            response = tts_client.synthesize_speech(
-                input=synthesis_input, voice=voice_params, audio_config=audio_config
-            )
-        except Exception as e:
-            return jsonify({"error": f"Failed to synthesize speech: {str(e)}"}), 500
+        # Generate audio
+        response = tts_client.synthesize_speech(
+            input=synthesis_input, voice=voice_params, audio_config=audio_config
+        )
 
         # Save audio to Google Cloud Storage
-        try:
-            storage_client = storage.Client()
-            bucket = storage_client.bucket("tts-audio-storage-first")
-            blob = bucket.blob("output.mp3")
-            blob.upload_from_string(response.audio_content)
-        except Exception as e:
-            return jsonify({"error": f"Failed to upload audio to Google Cloud Storage: {str(e)}"}), 500
-
-        # Return the URL of the audio file
-        return jsonify({"audio_url": blob.public_url})
-    
+        storage_client = storage.Client(credentials=credentials, project=project_id)
+        bucket = storage_client.bucket("tts-audio-storage-first")
+        blob = bucket.blob("output.mp3")
+        blob.upload_from_string(response.audio_content)
+        return jsonify({"audio_url": blob.public_url} ) 
     except Exception as e:
-        # Catch any unexpected errors
-        return jsonify({"error": f"An unexpected error occurred: {str(e)}"}), 500
+        # Return detailed error message for debugging
+        return jsonify({"error": str(e)}), 500
 
 if __name__ == "__main__":
     app.run(debug=True)
