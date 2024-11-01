@@ -11,5 +11,5 @@ RUN pip install -r requirements.txt
 # Copy the rest of the application code
 COPY . /app
 
-# Specify the command to run the app2
+# Specify the command to run the app
 CMD ["python", "app.py"]
