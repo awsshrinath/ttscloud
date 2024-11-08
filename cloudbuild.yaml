@@ -20,7 +20,7 @@ steps:
     args:
       - 'run'
       - 'deploy'
-      - 'my-ttse'
+      - 'my-tts'
       - '--image'
       - 'gcr.io/$PROJECT_ID/ttstrigger1:$COMMIT_SHA'
       - '--region'
@@ -28,6 +28,8 @@ steps:
       - '--platform'
       - 'managed'
       - '--allow-unauthenticated'
+# Specify a bucket for logs
+logsBucket: "gs://vdocomp-logs"
 
 substitutions:
   _SERVICE_NAME: 'my-tts '
