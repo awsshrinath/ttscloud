@@ -21,7 +21,7 @@ steps:
       - '-t'
       - 'gcr.io/$PROJECT_ID/tts1:$COMMIT_SHA'
       - '-f'
-      - './tts1/Dockerfile'
+      - './TTS/Dockerfile'
       - './tts1'
     waitFor: ['Check service1']
     condition:
@@ -35,7 +35,7 @@ steps:
       - 'gcr.io/$PROJECT_ID/tts1:$COMMIT_SHA'
     waitFor: ['Build tts1']
     condition:
-      fileExists: /workspace/service1.txt
+      fileExists: /workspace/tts1.txt
 
   # Step 4: Deploy the service to Cloud Run
   - name: 'gcr.io/cloud-builders/gcloud'
@@ -53,7 +53,7 @@ steps:
       - '--allow-unauthenticated'
     waitFor: ['Push tts1']
     condition:
-      fileExists: /workspace/service1.txt
+      fileExists: /workspace/stts1.txt
 
 # Specify a bucket for logs
 logsBucket: "gs://vdocomp-logs"
