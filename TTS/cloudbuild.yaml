@@ -8,7 +8,7 @@ steps:
       - |
         if git diff --name-only $COMMIT_SHA~1 $COMMIT_SHA | grep '^tts1/'; then
           echo "Changes detected in tts1"
-          touch /workspace/tts1.txt
+          touch /TTS/tts1.txt
         else
           echo "No changes in tts1"
         fi
@@ -25,7 +25,7 @@ steps:
       - './tts1'
     waitFor: ['Check service1']
     condition:
-      fileExists: /workspace/service1.txt
+      fileExists: /TTS/service1.txt
 
   # Step 3: Push the Docker image to Google Container Registry
   - name: 'gcr.io/cloud-builders/docker'
@@ -35,7 +35,7 @@ steps:
       - 'gcr.io/$PROJECT_ID/tts1:$COMMIT_SHA'
     waitFor: ['Build tts1']
     condition:
-      fileExists: /workspace/tts1.txt
+      fileExists: /TTS/tts1.txt
 
   # Step 4: Deploy the service to Cloud Run
   - name: 'gcr.io/cloud-builders/gcloud'
@@ -53,7 +53,7 @@ steps:
       - '--allow-unauthenticated'
     waitFor: ['Push tts1']
     condition:
-      fileExists: /workspace/stts1.txt
+      fileExists: /TTS/stts1.txt
 
 # Specify a bucket for logs
 logsBucket: "gs://vdocomp-logs"
