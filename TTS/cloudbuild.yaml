@@ -1,64 +1,63 @@
 steps:
-  # Step 1: Check for changes in the TTS folder
+  # Step 1: Detect changes in service1 (tts1 folder)
   - name: 'ubuntu'
-    id: 'Check TTS service'
+    id: 'Check service1'
     entrypoint: 'bash'
     args:
       - '-c'
       - |
-        if git diff --name-only $COMMIT_SHA~1 $COMMIT_SHA | grep '^TTS/'; then
-          echo "Changes detected in TTS service"
-          touch /TTS/tts_changes.txt
+        if git diff --name-only $COMMIT_SHA~1 $COMMIT_SHA | grep '^tts1/'; then
+          echo "Changes detected in tts1"
+          touch /TTS/tts1.txt
         else
-          echo "No changes in TTS service"
+          echo "No changes in tts1"
         fi
 
-  # Step 2: Build the Docker image for TTS service if changes are detected
+  # Step 2: Build the Docker image for tts1
   - name: 'gcr.io/cloud-builders/docker'
-    id: 'Build TTS service'
-    entrypoint: 'bash'
+    id: 'Build tts1'
     args:
-      - '-c'
-      - |
-        if [ -f /TTS/tts_changes.txt ]; then
-          docker build -t gcr.io/$PROJECT_ID/tts:$COMMIT_SHA -f ./TTS/Dockerfile ./TTS
-        else
-          echo "Skipping build for TTS service"
-        fi
-    waitFor: ['Check TTS service']
+      - 'build'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/tts1:$COMMIT_SHA'
+      - '-f'
+      - './TTS/Dockerfile'
+      - './tts1'
+    waitFor: ['Check service1']
+    condition:
+      fileExists: /TTS/service1.txt
 
-  # Step 3: Push the Docker image if the build was executed
+  # Step 3: Push the Docker image to Google Container Registry
   - name: 'gcr.io/cloud-builders/docker'
-    id: 'Push TTS service'
-    entrypoint: 'bash'
+    id: 'Push tts1'
     args:
-      - '-c'
-      - |
-        if [ -f /TTS/tts_changes.txt ]; then
-          docker push gcr.io/$PROJECT_ID/tts:$COMMIT_SHA
-        else
-          echo "Skipping push for TTS service"
-        fi
-    waitFor: ['Build TTS service']
+      - 'push'
+      - 'gcr.io/$PROJECT_ID/tts1:$COMMIT_SHA'
+    waitFor: ['Build tts1']
+    condition:
+      fileExists: /TTS  /tts1.txt
 
-  # Step 4: Deploy the TTS service to Cloud Run if the image was pushed
+  # Step 4: Deploy the service to Cloud Run
   - name: 'gcr.io/cloud-builders/gcloud'
-    id: 'Deploy TTS service'
-    entrypoint: 'bash'
+    id: 'Deploy tts1'
     args:
-      - '-c'
-      - |
-        if [ -f /TTS/tts_changes.txt ]; then
-          gcloud run deploy tts --image gcr.io/$PROJECT_ID/tts:$COMMIT_SHA --region asia-south1 --platform managed --allow-unauthenticated
-        else
-          echo "Skipping deploy for TTS service"
-        fi
-    waitFor: ['Push TTS service']
+      - 'run'
+      - 'deploy'
+      - '$_SERVICE_NAME'
+      - '--image'
+      - 'gcr.io/$PROJECT_ID/tts1:$COMMIT_SHA'
+      - '--region'
+      - '$_REGION'
+      - '--platform'
+      - 'managed'
+      - '--allow-unauthenticated'
+    waitFor: ['Push tts1']
+    condition:
+      fileExists: /TTS/stts1.txt
 
-# Optional: Specify a bucket for logs
+# Specify a bucket for logs
 logsBucket: "gs://vdocomp-logs"
 
-# Substitutions for reusability
 substitutions:
-  _SERVICE_NAME: 'tts'
+  _SERVICE_NAME: 'tts1'
   _REGION: 'asia-south1'
