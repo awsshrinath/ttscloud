@@ -24,11 +24,11 @@ steps:
       - '--image'
       - 'gcr.io/$PROJECT_ID/ttstrigger1:$COMMIT_SHA'
       - '--region'
-      - 'YOUR_REGION'
+      - 'asia-south1'
       - '--platform'
       - 'managed'
       - '--allow-unauthenticated'
 
 substitutions:
-  _SERVICE_NAME: 'my-tts'
+  _SERVICE_NAME: 'my-tts '
   _REGION: 'asia-south1'
