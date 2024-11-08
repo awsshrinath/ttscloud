@@ -12,4 +12,7 @@ RUN pip install -r requirements.txt
 COPY . /app
 
 # Specify the command to run the app
-CMD ["python", "app.py"]
+CMD ["python", "ttsapp.py"]
+
+# Expose the port for the Flask app
+EXPOSE 8080
