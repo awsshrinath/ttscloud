@@ -20,7 +20,7 @@ steps:
     args:
       - 'run'
       - 'deploy'
-      - 'my-service'
+      - 'my-ttse'
       - '--image'
       - 'gcr.io/$PROJECT_ID/ttstrigger1:$COMMIT_SHA'
       - '--region'
