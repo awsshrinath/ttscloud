@@ -88,6 +88,4 @@ steps:
 # Optional: Specify logs bucket for centralized logging
 logsBucket: "gs://vdocomp-logs"
 
-# Substitutions for reusability
-substitutions:
-  _REGION: 'asia-south1'
+
