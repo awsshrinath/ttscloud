@@ -1,10 +1,11 @@
 import os
 from google.oauth2 import service_account
 from google.cloud import storage, texttospeech
+from google.auth import default
 from flask import Flask, request, jsonify
 
 app = Flask(__name__)
-credentials = service_account.Credentials.from_service_account_file(r"C:\Users\MY PC\Documents\TTS\tts-service-pro1-cf81f6a8c62f.json")
+credentials, project = default()
 # Specify your project ID
 project_id = "tts-service-pro1"
 @app.route("/generate-audio", methods=["POST"])

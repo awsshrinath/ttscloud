@@ -4,9 +4,10 @@ import os
 import tempfile
 import uuid
 from google.cloud import storage
+from google.auth import default
 
 app = Flask(__name__)
-
+credentials, project = default()
 # Initialize Google Cloud Storage client
 storage_client = storage.Client()
 BUCKET_NAME = 'vdocomp'
