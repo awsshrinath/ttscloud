@@ -106,6 +106,7 @@ def process_video():
         }
 
         return jsonify(metadata)
+    #test command
 
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 8080))
